@@ -4,7 +4,7 @@
 /* El año es 2045, Eres el Ingeniero en Jefe de Software de la colonia marciana
  * "Ares V". Una reciente tormenta de arena ha dañado los sistemas principales
  * y el comandante te ha encomendado escribir un programa de emergencia en Java 
- * para estabilizar la base. 
+ *  para estabilizar la base. 
  * 
  * Tu misión se divide en dos fases críticas que determinarán la supervivencia
  * de la tripulación.
