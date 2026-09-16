@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template 
 */
 
-/* @author UserCP ] Rudy | Rafael */
+/* @author UserCP | Rudy | Rafael */
 
 package restauratemicasita;
 import java.util.Scanner;
