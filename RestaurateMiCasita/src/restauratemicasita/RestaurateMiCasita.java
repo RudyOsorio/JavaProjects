@@ -171,7 +171,7 @@ public class RestaurateMiCasita{
         /* divisa */
         char divisa = 'L';
         
-        /* array sub menu estradas */
+        /* array sub menu estradas | no mantiene formato de cuadro en pantalla */
         /*String[] entradasMenu = {entradaSopa,entradaBrucheta,entradaCalamares,entradaEmbutidos,entradaCesar};
         double[] preciosEntradas = {precioSopa,precioBrucheta,precioCalamares,precioEmbutidos,precioCesar};
         int n = 1;
@@ -375,11 +375,6 @@ public class RestaurateMiCasita{
     
     public static void VisualizarAreaMesasArrayList(ArrayList<Integer> arregloVistaMesas){
         int valorTemp = 0;
-        /*for(int i = 0; i < arregloVistaMesas.size(); i++){
-            //System.out.printf("Posicion: %d\t",i);
-            valorTemp = arregloVistaMesas.get(i);
-            System.out.printf("Mesa: %d => \n",valorTemp);
-        }*/
         // Formato para desplegar cada mesa con su área correspondiente
         for(int i = 0; i < mesasReservadas.length; i++){
             int numeroMesa = i + 1; // para lectura humana | que no comience en cero
@@ -425,7 +420,7 @@ public class RestaurateMiCasita{
             }
         }
         
-        /**/
+        /* mensajes de respuestas de accion */
         if(!hayReservas){
             System.out.println(".        No hay mesas reservadas actualmente.   .");
             System.out.println(".        Primero debe reservar una mesa.        .");
@@ -434,7 +429,7 @@ public class RestaurateMiCasita{
             return;
         }
         
-        /**/
+        /* mensaje en respuesta de accion */
         System.out.println(".        Mesas reservadas actualmente:           .");
         for(int i = 0; i < mesasReservadas.length; i++){
             if(mesasReservadas[i]){
@@ -445,7 +440,7 @@ public class RestaurateMiCasita{
             }
         }
         
-        /**/
+        /* mensajes de regreso */
         System.out.println("...................................................");
         System.out.println(".        0. Volver al menu principal              .");
         System.out.println("...................................................");
