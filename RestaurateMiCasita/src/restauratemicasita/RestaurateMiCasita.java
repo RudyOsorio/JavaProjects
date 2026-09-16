@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template 
 */
 
-/* @author UserCP | Rudy | Rafael */
+/* @author UserCP | Rudy | Rafael | G2 */
 
 package restauratemicasita;
 import java.util.Scanner;
@@ -17,6 +17,9 @@ public class RestaurateMiCasita{
     /* Listas acumuladoras para el pedido y sus costos */
     private static ArrayList<String> productosSeleccionados = new ArrayList<>(); /* tipo String para guardar nombre del producto*/
     private static ArrayList<Double> preciosSeleccionados = new ArrayList<>(); /* tipo doble para guardar precio del producto */
+    /* mapa de las mesas */
+    private static ArrayList<Integer> mapaMesas = new ArrayList<Integer>(); /* graficamos los lugares de cada mesa del restaurante */
+    int dimension = 0;
     
     /* control de reservacion de mesas */
     private static boolean[] mesasReservadas = new boolean[MESAS_RESERVADAS]; /* para mostrar si mesa esta reservada o disponible */
@@ -28,6 +31,14 @@ public class RestaurateMiCasita{
     public static void main(String[] args){
         Scanner scan = new Scanner(System.in);
         
+        /* listamos la cantidad de mesas que queremos */
+        int dimension = AreaMesasArrayList(mapaMesas);
+        int mesas = 8;
+        for(int i = 1; i <= mesas; i++){
+            mapaMesas.add(i);
+            dimension = AreaMesasArrayList(mapaMesas);
+        }
+        
         /* Constantes y Variables */
         final String NOMBRE_SISTEMA = "RESTAURANTE MI CASITA";
         int opcionPrincipal = 0;
@@ -35,12 +46,17 @@ public class RestaurateMiCasita{
         /* menu principal */
         while(opcionPrincipal != 5){
             /* array para el primer menu o menu principal */
-            String[] menuPrincipal = {"1. Ver Menu", "2. Reservar Mesa", "3. Asignar Mesero", "4. Imprimir Factura", "5. Salir"};
+            String[] menuPrincipal = {"1. Reservar Mesa", "2. Ver Menu", "3. Asignar Mesero", "4. Imprimir Factura", "5. Salir"};
 
             /* creación de la interfaz de primera pantalla  */
             System.out.println("===========================================");
             System.out.println("====       " + NOMBRE_SISTEMA + "       ====");
             System.out.println("===========================================");
+            System.out.printf(".  Total mesas del restaurante: %d\n",dimension);
+            System.out.println("...........................................");
+            /* visualizamos el mapa de las mesas */
+            VisualizarAreaMesasArrayList(mapaMesas);
+            /**/
             System.out.println("...........................................");
             System.out.println(".  Seleccione una opcion                  .");
             System.out.println(".  ----------------------                 .");
@@ -61,10 +77,10 @@ public class RestaurateMiCasita{
                 opcionPrincipal = scan.nextInt();
                 switch(opcionPrincipal){
                     case 1:
-                        mostrarSubmenuMenu(scan);
+                        reservarMesa(scan);
                     break;
                     case 2:
-                        reservarMesa(scan);
+                        mostrarSubmenuMenu(scan);
                     break;
                     case 3:
                         asignarMesero(scan);
@@ -96,7 +112,7 @@ public class RestaurateMiCasita{
         
         /* pantalla con categorias del menu comidas */
         while(opcionCategoria != 4){
-            final String MENU_ENTRADAS = "1. Ver Menu | Seleccione una opcion";
+            final String MENU_ENTRADAS = "2. Ver Menu | Seleccione una opcion";
             System.out.println(".....................................................");
             System.out.println(".     "+MENU_ENTRADAS+"           .");
             System.out.println(".        ---------------------------------          .");
@@ -208,7 +224,7 @@ public class RestaurateMiCasita{
         }
     }// fin mostrar entradas
     
-    /**/
+    /* pantalla con el sub menu de platillos fuertes del menu comidas */
     private static void mostrarPlatillosFuertes(Scanner scanner){
         System.out.println(".................................................................");
         System.out.println(".          2 Platillos Fuertes | Seleccione una opcion          .");
@@ -254,7 +270,7 @@ public class RestaurateMiCasita{
         }
     }// fin mostrar platillos fuertes
     
-    /**/
+    /* pantalla con el sub menu de especialidades de la casa del menu comidas */
     private static void mostrarEspecialidades(Scanner scanner){
         System.out.println(".................................................................");
         System.out.println(".          3 Especialidad de la casa | Seleccione una opcion    .");
@@ -311,7 +327,7 @@ public class RestaurateMiCasita{
     /* reservacion de mesas */
     private static void reservarMesa(Scanner scanner){
         System.out.println(".................................................");
-        System.out.println(".     2  Reservacion de mesa                    .");
+        System.out.println(".     1  Reservacion de mesa                    .");
         System.out.println(".        --------------------                   .");
         System.out.println(".        Estado actual de las mesas:            .");
         
@@ -350,6 +366,28 @@ public class RestaurateMiCasita{
         System.out.println(".................................................");
         System.out.println();
     }// fin de reservacion de mesas
+    
+    private static int AreaMesasArrayList(ArrayList<Integer> arregloAreas){
+        int valorTemp = 0;
+        valorTemp = arregloAreas.size();
+        return valorTemp;
+    }// fin de AreaMesasArrayList
+    
+    public static void VisualizarAreaMesasArrayList(ArrayList<Integer> arregloVistaMesas){
+        int valorTemp = 0;
+        /*for(int i = 0; i < arregloVistaMesas.size(); i++){
+            //System.out.printf("Posicion: %d\t",i);
+            valorTemp = arregloVistaMesas.get(i);
+            System.out.printf("Mesa: %d => \n",valorTemp);
+        }*/
+        // Formato para desplegar cada mesa con su área correspondiente
+        for(int i = 0; i < mesasReservadas.length; i++){
+            int numeroMesa = i + 1; // para lectura humana | que no comience en cero
+            String area = obtenerAreaMesa(numeroMesa);
+            String estado = mesasReservadas[i] ? "Reservada" : "Disponible";
+            System.out.printf(".  Mesa %d (%-10s): %-11s       .\n", numeroMesa, area, estado);
+        }
+    }// fin de VisualizarContenidoArrayList
     
     /* mapa de posicion de las mesas */
     private static String obtenerAreaMesa(int numeroMesa){
