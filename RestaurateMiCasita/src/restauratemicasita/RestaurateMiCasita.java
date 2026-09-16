@@ -17,7 +17,7 @@ public class RestaurateMiCasita{
     /* Listas acumuladoras para el pedido y sus costos */
     private static ArrayList<String> productosSeleccionados = new ArrayList<>(); /* tipo String para guardar nombre del producto*/
     private static ArrayList<Double> preciosSeleccionados = new ArrayList<>(); /* tipo doble para guardar precio del producto */
-    /* mapa de las mesas */
+    /* cantida de mesas */
     private static ArrayList<Integer> mapaMesas = new ArrayList<Integer>(); /* graficamos los lugares de cada mesa del restaurante */
     int dimension = 0;
     
