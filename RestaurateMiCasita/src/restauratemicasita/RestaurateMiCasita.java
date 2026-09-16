@@ -96,8 +96,9 @@ public class RestaurateMiCasita{
         
         /* pantalla con categorias del menu comidas */
         while(opcionCategoria != 4){
+            final String MENU_ENTRADAS = "1. Ver Menu | Seleccione una opcion";
             System.out.println(".....................................................");
-            System.out.println(".     1. Ver Menu | Seleccione una opcion           .");
+            System.out.println(".     "+MENU_ENTRADAS+"           .");
             System.out.println(".        ---------------------------------          .");
             System.out.println(".        1. Entradas:                               .");
             System.out.println(".        2. Platillos fuertes:                      .");
@@ -106,7 +107,7 @@ public class RestaurateMiCasita{
             System.out.println(".....................................................");
             
             /**/
-            if(scanner.hasNextInt()){
+            if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
                 opcionCategoria = scanner.nextInt();
                 switch(opcionCategoria){
                     case 1:
@@ -175,7 +176,7 @@ public class RestaurateMiCasita{
         System.out.println("..................................................................");
         
         /**/
-        if(scanner.hasNextInt()){
+        if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
             int entradaSeleccionada = scanner.nextInt();
             switch(entradaSeleccionada){
                 case 1:
@@ -221,7 +222,7 @@ public class RestaurateMiCasita{
         System.out.println(".................................................................");
         
         /**/
-        if(scanner.hasNextInt()){
+        if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
             int entradaSeleccionada = scanner.nextInt();
             switch(entradaSeleccionada){
                 case 1:
@@ -267,7 +268,7 @@ public class RestaurateMiCasita{
         System.out.println(".................................................................");
         
         /**/
-        if(scanner.hasNextInt()){
+        if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
             int entradaSeleccionada = scanner.nextInt();
             switch(entradaSeleccionada){
                 case 1:
