@@ -15,11 +15,13 @@ public class RestaurateMiCasita{
     private static int MESERO_ASIGNADO = 8; /* ocho meseros */
     
     /* Listas acumuladoras para el pedido y sus costos */
-    private static ArrayList<String> productosSeleccionados = new ArrayList<>(); /* tipo String para guardar nombre del producto*/
-    private static ArrayList<Double> preciosSeleccionados = new ArrayList<>(); /* tipo doble para guardar precio del producto */
+    @SuppressWarnings("unchecked") /* indicando al compilador ignorar advertencias */
+    private static ArrayList<String>[] productosPorMesa = new ArrayList[MESAS_RESERVADAS]; /* tipo String para guardar nombre del producto*/
+    @SuppressWarnings("unchecked") /* indicando al compilador ignorar advertencias */
+    private static ArrayList<Double>[] preciosPorMesa = new ArrayList[MESAS_RESERVADAS]; /* tipo String para guardar nombre del producto*/
+    
     /* cantida de mesas */
-    private static ArrayList<Integer> mapaMesas = new ArrayList<Integer>(); /* graficamos los lugares de cada mesa del restaurante */
-    int dimension = 0;
+    private static ArrayList<Integer> mapaMesas = new ArrayList<Integer>(); /* indicamos los lugares de cada mesa del restaurante */
     
     /* control de reservacion de mesas */
     private static boolean[] mesasReservadas = new boolean[MESAS_RESERVADAS]; /* para mostrar si mesa esta reservada o disponible */
@@ -27,9 +29,20 @@ public class RestaurateMiCasita{
     /* Arreglo para almacenar el nombre del mesero asignado a cada mesa */
     private static String[] meserosAsignados = new String[MESERO_ASIGNADO];
     
+    /* Estructuras para almacenar el historial de facturas pagadas */
+    private static ArrayList<Integer> historialMesasFacturadas = new ArrayList<>();
+    private static ArrayList<Double> historialTotalesFacturados = new ArrayList<>();
+    private static ArrayList<String> historialMeserosFacturados = new ArrayList<>();
+    
     /* @param args the command line arguments */
     public static void main(String[] args){
         Scanner scan = new Scanner(System.in);
+        
+        /* Inicializamos las listas por cada mesa */
+        for (int i = 0; i < MESAS_RESERVADAS; i++) {
+            productosPorMesa[i] = new ArrayList<>();
+            preciosPorMesa[i] = new ArrayList<>();
+        }
         
         /* listamos la cantidad de mesas que queremos */
         int dimension = AreaMesasArrayList(mapaMesas);
@@ -44,9 +57,9 @@ public class RestaurateMiCasita{
         int opcionPrincipal = 0;
         
         /* menu principal */
-        while(opcionPrincipal != 5){
+        while(opcionPrincipal != 6){
             /* array para el primer menu o menu principal */
-            String[] menuPrincipal = {"1. Reservar Mesa", "2. Ver Menu", "3. Asignar Mesero", "4. Imprimir Factura", "5. Salir"};
+            String[] menuPrincipal = {"1. Reservar Mesa", "2. Ver Menu", "3. Asignar Mesero", "4. Imprimir Factura", "5. Ver Facturas", "6. Salir"};
 
             /* creación de la interfaz de primera pantalla  */
             System.out.println("===========================================");
@@ -56,7 +69,6 @@ public class RestaurateMiCasita{
             System.out.println("...........................................");
             /* visualizamos el mapa de las mesas */
             VisualizarAreaMesasArrayList(mapaMesas);
-            /**/
             System.out.println("...........................................");
             System.out.println(".  Seleccione una opcion                  .");
             System.out.println(".  ----------------------                 .");
@@ -64,12 +76,6 @@ public class RestaurateMiCasita{
             for(String menu : menuPrincipal){
                 System.out.println(".  "+menu);
             }
-            /* impresiones linea por linea como segunda opcion de menu principal */
-            /*System.out.println(".  1. Ver Menu                            .");
-            System.out.println(".  2. Reservar Mesa                       .");
-            System.out.println(".  3. Asignar Mesero                      .");
-            System.out.println(".  4. Imprimir Factura                    .");
-            System.out.println(".  5. Salir                               .");*/
             System.out.println("...........................................");
             
             /* mostrando las demas opciones de cada item del menu principal */
@@ -89,8 +95,12 @@ public class RestaurateMiCasita{
                         imprimirFactura(scan);
                     break;
                     case 5:
-                        System.out.println(".  Gracias por preferirnos!               .");
-                        System.out.println(".  Esperamos que vuelva pronto!           .");
+                        verFacturas(scan);
+                    break;
+                    case 6:
+                        System.out.println(".  Cerrando el Sistema...                 .");
+                        System.out.println(".  Guardando todos los registros...       .");
+                        System.out.println(".  Levantamos campamento!                 .");
                         System.out.println("...........................................");
                         System.out.println("");
                     break;
@@ -107,6 +117,31 @@ public class RestaurateMiCasita{
     
     /* mostra el sub menu de comidas */
     private static void mostrarSubmenuMenu(Scanner scanner){
+        System.out.println(".....................................................");
+        System.out.println(".  Ingrese numero de mesa reservada para ordenar:   .");
+        System.out.println(".....................................................");
+        
+        /* mensaje de respuesta de accion */
+        if (!scanner.hasNextInt()) {
+            System.out.println(".  Entrada invalida.                      .");
+            scanner.next();
+            return;
+        }
+        
+        /* mensaje de respuesta de accion */
+        int numeroMesa = scanner.nextInt();
+        if (numeroMesa < 1 || numeroMesa > 8) {
+            System.out.println(".  Numero de mesa invalido (1-8).          .");
+            return;
+        }
+        
+        /* mensaje de respuesta de accion */
+        int indice = numeroMesa - 1;
+        if (!mesasReservadas[indice]) {
+            System.out.println(".  La Mesa " + numeroMesa + " no esta reservada. Reserve primero. .");
+            return;
+        }
+        
         /* variable categorias */
         int opcionCategoria = 0;
         
@@ -122,18 +157,18 @@ public class RestaurateMiCasita{
             System.out.println(".        4. Volver al menu principal                .");
             System.out.println(".....................................................");
             
-            /**/
+            /* sub menu de comidas */
             if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
                 opcionCategoria = scanner.nextInt();
                 switch(opcionCategoria){
                     case 1:
-                        mostrarEntradas(scanner);
+                        mostrarEntradas(scanner, numeroMesa);
                         break;
                     case 2:
-                        mostrarPlatillosFuertes(scanner);
+                        mostrarPlatillosFuertes(scanner, numeroMesa);
                         break;
                     case 3:
-                        mostrarEspecialidades(scanner);
+                        mostrarEspecialidades(scanner, numeroMesa);
                         break;
                     case 4:
                         System.out.println();
@@ -151,9 +186,9 @@ public class RestaurateMiCasita{
     }//fin sub menu
     
     /**/
-    private static void mostrarEntradas(Scanner scanner){
+    private static void mostrarEntradas(Scanner scanner, int numeroMesa){
         /* variable para encabezado del sub menu entradas */
-        String entradaCabecera = "1. Entradas | Seleccione una opcion";
+        String entradaCabecera = "1. Entradas (Mesa " + numeroMesa + ") | Seleccione una opcion";
         /* variables del sub menu entradas | [submenu_entradas => | entradas_menu | entradas_precio |] */
         String entradaSopa = "Sopa de Tomate Rustica:";
         String entradaBrucheta = "Bruschetta Clasica de Queso y Tomate:";
@@ -181,7 +216,7 @@ public class RestaurateMiCasita{
         
         /* pantalla con el sub menu de entradas del menu comidas */
         System.out.println("..................................................................");
-        System.out.println(".          "+entradaCabecera+"                   .");
+        System.out.println(".          "+entradaCabecera+"          .");
         System.out.println(".             ---------------------------------                  .");
         System.out.println(".             1. "+entradaSopa+"                 "+divisa+"  "+precioSopa+" .");
         System.out.println(".             2. "+entradaBrucheta+"   "+divisa+"  "+precioBrucheta+" .");
@@ -191,24 +226,24 @@ public class RestaurateMiCasita{
         System.out.println(".             6. "+entradaSalir+"                                  .");
         System.out.println("..................................................................");
         
-        /**/
+        /* agregando productos de entradas a pedidos */
         if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
             int entradaSeleccionada = scanner.nextInt();
             switch(entradaSeleccionada){
                 case 1:
-                    agregarProducto(entradaSopa, precioSopa); /* reemplazo precio por variable */
+                    agregarProducto(numeroMesa, entradaSopa, precioSopa); /* reemplazo precio por variable */
                 break;
                 case 2:
-                    agregarProducto(entradaBrucheta, precioBrucheta); /* reemplazo precio por variable */
+                    agregarProducto(numeroMesa, entradaBrucheta, precioBrucheta); /* reemplazo precio por variable */
                 break;
                 case 3:
-                    agregarProducto(entradaCalamares, precioCalamares); /* reemplazo precio por variable */
+                    agregarProducto(numeroMesa, entradaCalamares, precioCalamares); /* reemplazo precio por variable */
                 break;
                 case 4:
-                    agregarProducto(entradaEmbutidos, precioEmbutidos); /* reemplazo precio por variable */
+                    agregarProducto(numeroMesa, entradaEmbutidos, precioEmbutidos); /* reemplazo precio por variable */
                 break;
                 case 5:
-                    agregarProducto(entradaCesar, 150.00); /* no se ha reemplazado para ejemplo */
+                    agregarProducto(numeroMesa, entradaCesar, precioCesar); /* reemplazo precio por variable */
                 break;
                 case 6:
                     System.out.println();
@@ -225,9 +260,9 @@ public class RestaurateMiCasita{
     }// fin mostrar entradas
     
     /* pantalla con el sub menu de platillos fuertes del menu comidas */
-    private static void mostrarPlatillosFuertes(Scanner scanner){
+    private static void mostrarPlatillosFuertes(Scanner scanner, int numeroMesa){
         System.out.println(".................................................................");
-        System.out.println(".          2 Platillos Fuertes | Seleccione una opcion          .");
+        System.out.println(".          2 Platillos Fuertes (Mesa " + numeroMesa + ") | Seleccione una opcion .");
         System.out.println(".            ------------------------------------------         .");
         System.out.println(".            1. Filete Mignon:                          L240.00 .");
         System.out.println(".            2. Salmon a la Plancha:                    L350.00 .");
@@ -237,24 +272,24 @@ public class RestaurateMiCasita{
         System.out.println(".            6. Volver al menu                                  .");
         System.out.println(".................................................................");
         
-        /**/
+        /* agregamos productos de platillos fuertes a pedidos */
         if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
             int entradaSeleccionada = scanner.nextInt();
             switch(entradaSeleccionada){
                 case 1:
-                    agregarProducto("Filete Mignon", 240.00);
+                    agregarProducto(numeroMesa,"Filete Mignon", 240.00);
                 break;
                 case 2:
-                    agregarProducto("Salmon a la Plancha", 350.00);
+                    agregarProducto(numeroMesa, "Salmon a la Plancha", 350.00);
                 break;
                 case 3:
-                    agregarProducto("Lasagna", 220.00);
+                    agregarProducto(numeroMesa, "Lasagna", 220.00);
                 break;
                 case 4:
-                    agregarProducto("Risoto", 180.00);
+                    agregarProducto(numeroMesa, "Risoto", 180.00);
                 break;
                 case 5:
-                    agregarProducto("Tacos gourmet", 140.00);
+                    agregarProducto(numeroMesa, "Tacos gourmet", 140.00);
                 break;
                 case 6:
                     System.out.println();
@@ -271,9 +306,9 @@ public class RestaurateMiCasita{
     }// fin mostrar platillos fuertes
     
     /* pantalla con el sub menu de especialidades de la casa del menu comidas */
-    private static void mostrarEspecialidades(Scanner scanner){
+    private static void mostrarEspecialidades(Scanner scanner, int numeroMesa){
         System.out.println(".................................................................");
-        System.out.println(".          3 Especialidad de la casa | Seleccione una opcion    .");
+        System.out.println(".          3 Especialidades (Mesa " + numeroMesa + ") | Seleccione una opcion    .");
         System.out.println(".            ------------------------------------------------   .");
         System.out.println(".            1. Parrillada al carbon:                   L900.00 .");
         System.out.println(".            2. Sopa de caracol:                        L170.00 .");
@@ -283,24 +318,24 @@ public class RestaurateMiCasita{
         System.out.println(".            6. Volver al menu                                  .");
         System.out.println(".................................................................");
         
-        /**/
+        /* agregamos productos de especialidades a pedidos */
         if(scanner.hasNextInt()){ /* comprobamos si la entrada es un numero entero o int para cada case del switch */
             int entradaSeleccionada = scanner.nextInt();
             switch(entradaSeleccionada){
                 case 1:
-                    agregarProducto("Parrillada al carbon", 900.00);
+                    agregarProducto(numeroMesa, "Parrillada al carbon", 900.00);
                 break;
                 case 2:
-                    agregarProducto("Sopa de caracol", 170.00);
+                    agregarProducto(numeroMesa, "Sopa de caracol", 170.00);
                 break;
                 case 3:
-                    agregarProducto("Plato tipico combinado", 220.00);
+                    agregarProducto(numeroMesa, "Plato tipico combinado", 220.00);
                 break;
                 case 4:
-                    agregarProducto("Costilla de cerdo en salsa BBQ", 180.00);
+                    agregarProducto(numeroMesa, "Costilla de cerdo en salsa BBQ", 180.00);
                 break;
                 case 5:
-                    agregarProducto("Frijoles, chismol y carne en anafre", 180.00);
+                    agregarProducto(numeroMesa, "Frijoles, chismol y carne en anafre", 180.00);
                 break;
                 case 6:
                     System.out.println();
@@ -317,10 +352,11 @@ public class RestaurateMiCasita{
     }// fin mostrar especialidades
     
     /* proceso de agregar productos del menu */
-    private static void agregarProducto(String nombre, double precio){
-        productosSeleccionados.add(nombre);
-        preciosSeleccionados.add(precio);
-        System.out.println(".  -> " + nombre + " agregado a la orden.");
+    private static void agregarProducto(int numeroMesa, String nombre, double precio){
+        int indice = numeroMesa - 1;
+        productosPorMesa[indice].add(nombre);
+        preciosPorMesa[indice].add(precio);
+        System.out.println(".  -> " + nombre + " agregado a la orden de la Mesa " + numeroMesa + ".");
         System.out.println();
     }
     
@@ -335,7 +371,7 @@ public class RestaurateMiCasita{
         for(int i = 0; i < mesasReservadas.length; i++){
             int numeroMesa = i + 1; // para lectura humana | que no comience en cero
             String area = obtenerAreaMesa(numeroMesa);
-            String estado = mesasReservadas[i] ? "Reservada" : "Disponible";
+            String estado = mesasReservadas[i] ? "Reservada" : "Libre";
             System.out.printf(".        Mesa %d (%-10s): %-11s       .\n", numeroMesa, area, estado);
         }
         System.out.println(".................................................");
@@ -350,7 +386,7 @@ public class RestaurateMiCasita{
                 System.out.println(".  Regresando al menu principal...         .");
             }else if(mesaElegida >= 1 && mesaElegida <= 8){
                 int indice = mesaElegida - 1;
-                if(mesasReservadas[indice]) {
+                if(mesasReservadas[indice]){
                     System.out.println(".  Mesa " + mesaElegida + " Reservada. Seleccione otra.   .");
                 }else{
                     mesasReservadas[indice] = true;
@@ -368,18 +404,15 @@ public class RestaurateMiCasita{
     }// fin de reservacion de mesas
     
     private static int AreaMesasArrayList(ArrayList<Integer> arregloAreas){
-        int valorTemp = 0;
-        valorTemp = arregloAreas.size();
-        return valorTemp;
+        return arregloAreas.size();
     }// fin de AreaMesasArrayList
     
     public static void VisualizarAreaMesasArrayList(ArrayList<Integer> arregloVistaMesas){
-        int valorTemp = 0;
         // Formato para desplegar cada mesa con su área correspondiente
         for(int i = 0; i < mesasReservadas.length; i++){
             int numeroMesa = i + 1; // para lectura humana | que no comience en cero
             String area = obtenerAreaMesa(numeroMesa);
-            String estado = mesasReservadas[i] ? "Reservada" : "Disponible";
+            String estado = mesasReservadas[i] ? "Reservada" : "Libre";
             System.out.printf(".  Mesa %d (%-10s): %-11s       .\n", numeroMesa, area, estado);
         }
     }// fin de VisualizarContenidoArrayList
@@ -486,16 +519,6 @@ public class RestaurateMiCasita{
         System.out.println("========================================================");
         System.out.println("====              FACTURA DE CONSUMO                ====");
         System.out.println("========================================================");
-        
-        /* productos seleccionados */
-        if(productosSeleccionados.isEmpty()) {
-            System.out.println(".   No hay productos consumidos aun.                   .");
-            System.out.println("========================================================");
-            System.out.println();
-            return;
-        }
-        
-        /* mensaje para imprmir factura */
         System.out.println("   Ingrese el numero de mesa para generar la factura.  .");
         System.out.println(".  0. Volver al menu principal                         .");
         System.out.println("........................................................");
@@ -529,16 +552,25 @@ public class RestaurateMiCasita{
                 System.out.println("........................................................");
                 System.out.println(". CONSUMO REALIZADO:                                   .");
                 
+                /* verificamos los productos consumidos para esta mesa en particular */
+                ArrayList<String> productosMesa = productosPorMesa[indice];
+                ArrayList<Double> preciosMesa = preciosPorMesa[indice];
+                
+                /* mensaje de respuesta de accion */
+                if(productosMesa.isEmpty()){
+                    System.out.println(".  No hay productos consumidos en esta mesa.           .");
+                }
+                
                 /* sub total */
                 double subtotal = 0.0;
-                for (int i = 0; i < productosSeleccionados.size(); i++) {
-                    String nombre = productosSeleccionados.get(i);
-                    double precio = preciosSeleccionados.get(i);
+                for(int i = 0; i < productosMesa.size(); i++) {
+                    String nombre = productosMesa.get(i);
+                    double precio = preciosMesa.get(i);
                     System.out.printf(". %-35s L%7.2f  .\n", nombre, precio);
                     subtotal += precio;
                 }
 
-                /* Cálculos de ISV y Propina */
+                /* calculos de ISV y propina */
                 double isv = subtotal * 0.15;
                 double propinaSugerida = subtotal * 0.10;
                 double totalGeneral = subtotal + isv + propinaSugerida;
@@ -550,14 +582,67 @@ public class RestaurateMiCasita{
                 System.out.printf(". PROPINA SUGERIDA (10%%):             L%7.2f \n", propinaSugerida);
                 System.out.println("........................................................");
                 System.out.printf(". TOTAL A PAGAR:                      L%7.2f \n", totalGeneral);
+                
+                /* preguntar si desea marcar como pagada */
+                if(mesasReservadas[indice]){
+                    System.out.println(".  Desea marcar esta factura como pagada? (1: Si / 2: No) .");
+                    if(scanner.hasNextInt()){
+                        int opcionPago = scanner.nextInt();
+                        if(opcionPago == 1){
+                            /* registrar factura pagada en el historial */
+                            historialMesasFacturadas.add(mesaElegida);
+                            historialTotalesFacturados.add(totalGeneral);
+                            historialMeserosFacturados.add(nombreMesero);
+                            
+                            /* liberar mesa y limpiar datos de la orden */
+                            mesasReservadas[indice] = false;
+                            meserosAsignados[indice] = null;
+                            productosPorMesa[indice].clear();
+                            preciosPorMesa[indice].clear();
+                            
+                            System.out.println(".  -> Factura marcada como PAGADA.                   .");
+                            System.out.println(".  -> La Mesa " + mesaElegida + " ahora esta DISPONIBLE nuevamente. .");
+                        }else{
+                            System.out.println(".  -> La factura queda pendiente de pago.            .");
+                        }
+                    }else{
+                        System.out.println(".  Entrada invalida. Opcion omitida.                .");
+                        scanner.next();
+                    }
+                }// fin de if para marcar factura pagada
             }else{
                 System.out.println(".  Numero de mesa fuera de rango (0-8).   .");
-            }
+            }// fin de if para pago de factura
         }else{
             System.out.println(".  Entrada invalida. Ingrese un numero.   .");
             scanner.next();
-        }
+        }// fin de seleccion de mesa
         System.out.println("........................................................");
         System.out.println();
-    }
+    }// fin de funcion imprimirFactura
+    
+    /* ver el historial de facturas pagadas con numero de mesa */
+    private static void verFacturas(Scanner scanner){
+        System.out.println("========================================================");
+        System.out.println("====            HISTORIAL DE FACTURAS PAGADAS       ====");
+        System.out.println("========================================================");
+        
+        if(historialMesasFacturadas.isEmpty()){
+            System.out.println(".  No hay facturas pagadas registradas en el sistema. .");
+        }else{
+            double granTotal = 0.0;
+            for(int i = 0; i < historialMesasFacturadas.size(); i++){
+                int numMesa = historialMesasFacturadas.get(i);
+                double total = historialTotalesFacturados.get(i);
+                String mesero = historialMeserosFacturados.get(i);
+                granTotal += total;
+                
+                System.out.printf(". Factura #%d | Mesa: %d | Atendio: %-12s | Total: L%7.2f .\n", 
+                                  (i + 1), numMesa, mesero, total);
+            }// fin de ciclo for
+            System.out.println("........................................................");
+            System.out.printf(". TOTAL GENERAL RECAUDADO:              L%7.2f \n", granTotal);
+        }// fin de if else
+        System.out.println("========================================================\n");
+    }// fin de funcion verFacturas
 }//fin restaurante
